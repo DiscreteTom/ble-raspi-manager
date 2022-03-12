@@ -68,7 +68,8 @@ func setNewStaticIP(ip, routers string) {
 }
 
 func cancelStaticIp(reboot bool) {
-	runCommand("bash", "-c", "cat /etc/dhcpcd.conf | grep -Ev '^interface wlan0' | grep -Ev '^static ip_address=' | grep -Ev '^static routers=' > /etc/dhcpcd.conf")
+	runCommand("cp", "/etc/dhcpcd.conf", "/etc/dhcpcd.conf.backup")
+	runCommand("bash", "-c", "cat /etc/dhcpcd.conf.backup | grep -Ev '^interface wlan0' | grep -Ev '^static ip_address=' | grep -Ev '^static routers=' > /etc/dhcpcd.conf")
 	if reboot {
 		// runCommand("reboot", "now")
 	}
