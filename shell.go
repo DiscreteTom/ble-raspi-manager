@@ -14,7 +14,7 @@ func getSSID() string {
 	if len(out) == 0 {
 		return out
 	}
-	return out[6 : len(out)-1] // remove prefix `ssid="` and suffix `"`
+	return out[6 : len(out)-2] // remove prefix `ssid="` and suffix `"\n`
 }
 
 func getPSK() string {
@@ -22,7 +22,7 @@ func getPSK() string {
 	if len(out) == 0 {
 		return out
 	}
-	return out[5 : len(out)-1] // remove prefix `psk="` and suffix `"`
+	return out[5 : len(out)-2] // remove prefix `psk="` and suffix `"\n`
 }
 
 func getStaticIP() (bool, string) {
@@ -30,7 +30,7 @@ func getStaticIP() (bool, string) {
 	if len(out) == 0 {
 		return false, ""
 	}
-	return true, out[18:] // remove prefix `static ip_address=`
+	return true, out[18 : len(out)-1] // remove prefix `static ip_address=` and suffix `\n`
 }
 
 func runCommand(name string, arg ...string) (stdout string) {
