@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,14 +10,16 @@ import (
 
 type info struct {
 	SSID      string // wifi name
-	PSK       string // wiki password
+	PSK       string // wifi password
 	CurrentIP string // current ip address
+	Router    string
 	Static    bool   // whether ip is static
 	StaticIP  string // configured static ip
 }
 
 func main() {
 	config := getConfig()
+	currentInfo := info{}
 
 	namespaceUUID := uuid.NewSHA1(uuid.NameSpaceDNS, []byte("discretetom.github.io"))
 	serviceUUID := uuid.NewSHA1(namespaceUUID, []byte(config.Secret))
@@ -53,17 +54,29 @@ func main() {
 				Flags:  bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
 				ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
 					static, staticIP := getStaticIP()
-					result := info{
+					currentInfo = info{
 						SSID:      getSSID(),
 						PSK:       getPSK(),
 						CurrentIP: getCurrentIP(),
 						Static:    static,
 						StaticIP:  staticIP,
+						Router:    getRouter(),
 					}
-					return json.Marshal(result)
+					return json.Marshal(currentInfo)
 				},
 				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
-					fmt.Print(value)
+					newInfo := info{}
+					json.Unmarshal(value, &newInfo)
+
+					if newInfo.SSID != currentInfo.SSID || newInfo.PSK != currentInfo.PSK {
+						setNewWifi(newInfo.SSID, newInfo.PSK)
+					}
+					if !newInfo.Static && currentInfo.Static {
+						cancelStaticIp(true)
+					}
+					if newInfo.Static && (newInfo.StaticIP != currentInfo.StaticIP || newInfo.Router != currentInfo.Router) {
+						setNewStaticIP(newInfo.StaticIP, newInfo.Router)
+					}
 				},
 			},
 		},
