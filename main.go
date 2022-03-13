@@ -19,7 +19,6 @@ type info struct {
 
 func main() {
 	config := getConfig()
-	currentInfo := info{}
 
 	namespaceUUID := uuid.NewSHA1(uuid.NameSpaceDNS, []byte("discretetom.github.io"))
 	serviceUUID := uuid.NewSHA1(namespaceUUID, []byte(config.Secret))
@@ -53,18 +52,10 @@ func main() {
 				UUID:   charBleUUID,
 				Flags:  bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
 				ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
-					static, staticIP := getStaticIP()
-					currentInfo = info{
-						SSID:      getSSID(),
-						PSK:       getPSK(),
-						CurrentIP: getCurrentIP(),
-						Static:    static,
-						StaticIP:  staticIP,
-						Router:    getRouter(),
-					}
-					return json.Marshal(currentInfo)
+					return json.Marshal(getInfo())
 				},
 				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
+					currentInfo := getInfo()
 					newInfo := info{}
 					json.Unmarshal(value, &newInfo)
 
@@ -90,5 +81,17 @@ func main() {
 func must(action string, err error) {
 	if err != nil {
 		panic("failed to " + action + ": " + err.Error())
+	}
+}
+
+func getInfo() info {
+	static, staticIP := getStaticIP()
+	return info{
+		SSID:      getSSID(),
+		PSK:       getPSK(),
+		CurrentIP: getCurrentIP(),
+		Static:    static,
+		StaticIP:  staticIP,
+		Router:    getRouter(),
 	}
 }
