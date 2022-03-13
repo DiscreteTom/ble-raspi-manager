@@ -57,7 +57,7 @@ network={
 	psk="%s"
 }
 EOF`, ssid, psk))
-	// runCommand("bash", "-c", "wpa_cli -i wlan0 reconfigure") // restart interface to apply
+	runCommand("bash", "-c", "wpa_cli -i wlan0 reconfigure") // restart interface to apply
 }
 
 func setNewStaticIP(ip, routers string) {
@@ -65,14 +65,17 @@ func setNewStaticIP(ip, routers string) {
 	runCommand("bash", "-c", "echo 'interface wlan0' >> /etc/dhcpcd.conf")
 	runCommand("bash", "-c", fmt.Sprintf("echo 'static ip_address=%s' >> /etc/dhcpcd.conf", ip))
 	runCommand("bash", "-c", fmt.Sprintf("echo 'static routers=%s' >> /etc/dhcpcd.conf", routers))
-	// runCommand("reboot", "now")
+
+	fmt.Printf("Reboot by set new static ip/routers: %s %s.", ip, routers)
+	runCommand("reboot", "now")
 }
 
 func cancelStaticIp(reboot bool) {
 	runCommand("cp", "/etc/dhcpcd.conf", "/etc/dhcpcd.conf.backup")
 	runCommand("bash", "-c", "cat /etc/dhcpcd.conf.backup | grep -Ev '^interface wlan0' | grep -Ev '^static ip_address=' | grep -Ev '^static routers=' > /etc/dhcpcd.conf")
 	if reboot {
-		// runCommand("reboot", "now")
+		fmt.Println("Reboot by cancel static ip.")
+		runCommand("reboot", "now")
 	}
 }
 
