@@ -46,7 +46,8 @@ func getRouter() string {
 func setNewWifi(ssid, psk string) {
 	if len(getSSID()) != 0 {
 		// remove original settings
-		runCommand("sudo", "bash", "-c", "cat /etc/wpa_supplicant/wpa_supplicant.conf | grep -v network | grep -v ssid | grep -v psk | grep -v '}' > /etc/wpa_supplicant/wpa_supplicant.conf")
+		runCommand("cp", "/etc/wpa_supplicant/wpa_supplicant.conf", "/etc/wpa_supplicant/wpa_supplicant.conf.backup")
+		runCommand("sudo", "bash", "-c", "cat /etc/wpa_supplicant/wpa_supplicant.conf.backup | grep -v network | grep -v ssid | grep -v psk | grep -v '}' > /etc/wpa_supplicant/wpa_supplicant.conf")
 	}
 	// write new settings
 	runCommand("sudo", "bash", "-c", fmt.Sprintf(`
