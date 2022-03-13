@@ -1,0 +1,15 @@
+[Unit]
+Description=Raspi Bluetooth Low Energy Wifi Manager
+After=bluetooth.target
+Requires=bluetooth.target
+
+[Service]
+Type=idle
+User=root
+WorkingDirectory=/home/pi/raspi-ble-wifi-manager
+ExecStart=/home/pi/raspi-ble-wifi-manager/raspi-ble-wifi-manager
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
