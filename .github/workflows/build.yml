@@ -1,0 +1,26 @@
+name: Build
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17.8"
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: build arm64
+        run: GOOS=linux GOARCH=arm64 go build -o rbwm-arm64
+
+      - name: build arm
+        run: GOOS=linux GOARCH=arm go build -o rbwm-arm
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "rbwm-arm*,rbwm.service,config.json"
+          token: ${{ secrets.GITHUB_TOKEN }}
