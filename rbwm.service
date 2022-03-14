@@ -6,8 +6,8 @@ Requires=bluetooth.target
 [Service]
 Type=idle
 User=root
-WorkingDirectory=/home/pi/raspi-ble-wifi-manager
-ExecStart=/home/pi/raspi-ble-wifi-manager/raspi-ble-wifi-manager
+WorkingDirectory=/root/rbwm
+ExecStart=/root/rbwm/rbwm
 Restart=always
 RestartSec=60
 
