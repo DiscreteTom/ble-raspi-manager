@@ -8,7 +8,7 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-type info struct {
+type wifi struct {
 	SSID      string // wifi name
 	PSK       string // wifi password
 	CurrentIP string // current ip address
@@ -17,17 +17,26 @@ type info struct {
 	StaticIP  string // configured static ip
 }
 
+type command struct {
+	UUID   string
+	Cmd    string
+	Output string
+}
+
 func main() {
 	config := getConfig()
 
 	namespaceUUID := uuid.NewSHA1(uuid.NameSpaceDNS, []byte("discretetom.github.io"))
 	serviceUUID := uuid.NewSHA1(namespaceUUID, []byte(config.Secret))
-	charUUID := uuid.NewSHA1(serviceUUID, []byte("info"))
+	wifiCharUUID := uuid.NewSHA1(serviceUUID, []byte("wifi"))
+	cmdCharUUID := uuid.NewSHA1(serviceUUID, []byte("cmd"))
 
 	serviceBleUUID, _ := bluetooth.ParseUUID(serviceUUID.String())
-	charBleUUID, _ := bluetooth.ParseUUID(charUUID.String())
+	wifiCharBleUUID, _ := bluetooth.ParseUUID(wifiCharUUID.String())
+	cmdCharBleUUID, _ := bluetooth.ParseUUID(cmdCharUUID.String())
 
 	adapter := bluetooth.DefaultAdapter
+	currentCmd := &command{}
 
 	// Enable BLE interface.
 	must("enable BLE stack", adapter.Enable())
@@ -43,20 +52,18 @@ func main() {
 	must("start adv", adv.Start())
 
 	// Add Services
-	var wifiChar bluetooth.Characteristic
 	must("add service", adapter.AddService(&bluetooth.Service{
 		UUID: serviceBleUUID,
 		Characteristics: []bluetooth.CharacteristicConfig{
 			{
-				Handle: &wifiChar,
-				UUID:   charBleUUID,
-				Flags:  bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
+				UUID:  wifiCharBleUUID,
+				Flags: bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
 				ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
 					return json.Marshal(getInfo())
 				},
 				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
 					currentInfo := getInfo()
-					newInfo := info{}
+					newInfo := wifi{}
 					json.Unmarshal(value, &newInfo)
 
 					if newInfo.SSID != currentInfo.SSID || newInfo.PSK != currentInfo.PSK {
@@ -68,6 +75,26 @@ func main() {
 					if newInfo.Static && (newInfo.StaticIP != currentInfo.StaticIP || newInfo.Router != currentInfo.Router) {
 						setNewStaticIP(newInfo.StaticIP, newInfo.Router)
 					}
+				},
+			},
+			{
+				UUID:  cmdCharBleUUID,
+				Flags: bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
+				ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
+					return json.Marshal(currentCmd)
+				},
+				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
+					newCmd := &command{}
+					json.Unmarshal(value, &newCmd)
+					go func() {
+						output, err := runCommand("bash", "-c", newCmd.Cmd)
+						if err != nil {
+							output = "Error: " + err.Error()
+						}
+						currentCmd.Output = output
+						currentCmd.UUID = newCmd.UUID
+						currentCmd.Cmd = newCmd.Cmd
+					}()
 				},
 			},
 		},
@@ -84,9 +111,9 @@ func must(action string, err error) {
 	}
 }
 
-func getInfo() info {
+func getInfo() wifi {
 	static, staticIP := getStaticIP()
-	return info{
+	return wifi{
 		SSID:      getSSID(),
 		PSK:       getPSK(),
 		CurrentIP: getCurrentIP(),
