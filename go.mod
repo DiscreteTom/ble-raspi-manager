@@ -1,4 +1,4 @@
-module DiscreteTom/raspi-ble-wifi-manager
+module github/DiscreteTom/ble-raspi-manager
 
 go 1.17
 
