@@ -25,15 +25,18 @@ func NewCharacteristicConfig(serviceUUID uuid.UUID) bluetooth.CharacteristicConf
 		UUID:  cmdCharBleUUID,
 		Flags: bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
 		ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
-			txt, err := json.Marshal(currentCmd)
-			if err != nil {
-				return txt, err
-			}
-			if readOutputFrom < len(txt) {
-				readOutputFrom += 256
-				return txt[readOutputFrom-256:], nil
+			uuid := []byte(currentCmd.UUID)
+			output := []byte(currentCmd.Output)
+			if readOutputFrom < len(output) {
+				end := readOutputFrom + 256
+				if end > len(output) {
+					end = len(output)
+				}
+				result := append(uuid, output[readOutputFrom:end]...)
+				readOutputFrom += 256 // send 256 byte every time
+				return result, nil
 			} else {
-				return []byte{}, nil
+				return uuid, nil // only send uuid when finish
 			}
 		},
 		WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
