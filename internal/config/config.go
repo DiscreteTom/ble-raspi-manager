@@ -1,15 +1,15 @@
-package main
+package config
 
 import (
 	"encoding/json"
 	"os"
 )
 
-type config struct {
+type Config struct {
 	Secret string `json:"secret"`
 }
 
-func getConfig() config {
+func GetConfig() Config {
 	file, err := os.Open("config.json")
 	if err != nil {
 		panic(err)
@@ -17,7 +17,7 @@ func getConfig() config {
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	config := config{}
+	config := Config{}
 	if err := decoder.Decode(&config); err != nil {
 		panic(err)
 	}
