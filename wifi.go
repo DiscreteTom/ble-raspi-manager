@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-type wifi struct {
+type wifiInfo struct {
 	SSID      string // wifi name
 	PSK       string // wifi password
 	CurrentIP string // current ip address
@@ -11,9 +11,9 @@ type wifi struct {
 	StaticIP  string // configured static ip
 }
 
-func getWifiInfo() wifi {
+func getWifiInfo() wifiInfo {
 	static, staticIP := getStaticIP()
-	return wifi{
+	return wifiInfo{
 		SSID:      getSSID(),
 		PSK:       getPSK(),
 		CurrentIP: getCurrentIP(),

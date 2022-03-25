@@ -54,7 +54,7 @@ func main() {
 				},
 				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
 					currentInfo := getWifiInfo()
-					newInfo := wifi{}
+					newInfo := wifiInfo{}
 					json.Unmarshal(value, &newInfo)
 
 					if newInfo.SSID != currentInfo.SSID || newInfo.PSK != currentInfo.PSK {
