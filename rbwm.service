@@ -1,13 +1,13 @@
 [Unit]
-Description=Raspi Bluetooth Low Energy Wifi Manager
+Description=Bluetooth Low Energy Raspi Manager
 After=bluetooth.target
 Requires=bluetooth.target
 
 [Service]
 Type=idle
 User=root
-WorkingDirectory=/root/rbwm
-ExecStart=/root/rbwm/rbwm
+WorkingDirectory=/root/brm
+ExecStart=/root/brm/brm
 Restart=always
 RestartSec=60
 

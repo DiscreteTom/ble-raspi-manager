@@ -19,13 +19,13 @@ jobs:
 
       - name: build arm64
         run: |
-          GOOS=linux GOARCH=arm64 go build -o rbwm
-          zip rbwm-arm64.zip rbwm rbwm.service config.json
+          GOOS=linux GOARCH=arm64 go build -o brm
+          zip brm-arm64.zip brm brm.service config.json
 
       - name: build arm
         run: |
-          GOOS=linux GOARCH=arm go build -o rbwm
-          zip rbwm-arm.zip rbwm rbwm.service config.json
+          GOOS=linux GOARCH=arm go build -o brm
+          zip brm-arm.zip brm brm.service config.json
 
       - uses: ncipollo/release-action@v1
         with:
