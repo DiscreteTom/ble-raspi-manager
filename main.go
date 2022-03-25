@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github/DiscreteTom/ble-raspi-manager/characteristics/command"
 	"github/DiscreteTom/ble-raspi-manager/characteristics/wifi"
 	"github/DiscreteTom/ble-raspi-manager/internal/config"
@@ -40,6 +41,8 @@ func main() {
 			command.NewCharacteristicConfig(serviceUUID),
 		},
 	}))
+
+	fmt.Println("ble-raspi-manager is running...")
 
 	for { // run forever
 		time.Sleep(100 * time.Second)
