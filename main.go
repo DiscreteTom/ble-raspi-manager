@@ -8,15 +8,6 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-type wifi struct {
-	SSID      string // wifi name
-	PSK       string // wifi password
-	CurrentIP string // current ip address
-	Router    string
-	Static    bool   // whether ip is static
-	StaticIP  string // configured static ip
-}
-
 type command struct {
 	UUID   string
 	Cmd    string
@@ -44,7 +35,7 @@ func main() {
 	// Define the peripheral device info.
 	adv := adapter.DefaultAdvertisement()
 	must("config adv", adv.Configure(bluetooth.AdvertisementOptions{
-		LocalName:    "Raspi Wifi Manager",
+		LocalName:    "BLE Raspi Manager",
 		ServiceUUIDs: []bluetooth.UUID{serviceBleUUID},
 	}))
 
@@ -59,10 +50,10 @@ func main() {
 				UUID:  wifiCharBleUUID,
 				Flags: bluetooth.CharacteristicWritePermission | bluetooth.CharacteristicReadPermission,
 				ReadEvent: func(client bluetooth.Connection) ([]byte, error) {
-					return json.Marshal(getInfo())
+					return json.Marshal(getWifiInfo())
 				},
 				WriteEvent: func(client bluetooth.Connection, offset int, value []byte) {
-					currentInfo := getInfo()
+					currentInfo := getWifiInfo()
 					newInfo := wifi{}
 					json.Unmarshal(value, &newInfo)
 
@@ -87,7 +78,7 @@ func main() {
 					newCmd := &command{}
 					json.Unmarshal(value, &newCmd)
 					go func() {
-						output, err := runCommand("bash", "-c", newCmd.Cmd)
+						output, err := runCommand(newCmd.Cmd)
 						if err != nil {
 							output = "Error: " + err.Error()
 						}
@@ -108,17 +99,5 @@ func main() {
 func must(action string, err error) {
 	if err != nil {
 		panic("failed to " + action + ": " + err.Error())
-	}
-}
-
-func getInfo() wifi {
-	static, staticIP := getStaticIP()
-	return wifi{
-		SSID:      getSSID(),
-		PSK:       getPSK(),
-		CurrentIP: getCurrentIP(),
-		Static:    static,
-		StaticIP:  staticIP,
-		Router:    getRouter(),
 	}
 }
