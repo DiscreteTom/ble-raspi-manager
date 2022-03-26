@@ -20,3 +20,11 @@ func RunCommand(command string) (stdout string, err error) {
 	stdout = stdoutBuf.String()
 	return stdout, nil
 }
+
+func MustRunCommand(command string) string {
+	out, err := RunCommand(command)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
