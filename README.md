@@ -4,6 +4,11 @@ Manage Raspberry Pi using Bluetooth Low Energy.
 
 This repo contains the BLE server, which should be run on raspi. The BLE client is a browser app, you can access it [here](https://discretetom.github.io/Omnitrix/ble-raspi-manager/) from your PC or your phone.
 
+## Features
+
+- WIFI management.
+- Run shell commands.
+
 ## Build
 
 ```bash
