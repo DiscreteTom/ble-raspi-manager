@@ -54,5 +54,4 @@ func NewCharacteristicConfig(serviceUUID uuid.UUID) bluetooth.CharacteristicConf
 			}()
 		},
 	}
-
 }
