@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github/DiscreteTom/ble-raspi-manager/characteristics/command"
-	"github/DiscreteTom/ble-raspi-manager/characteristics/wifi"
+	"github/DiscreteTom/ble-raspi-manager/internal/characteristics/command"
+	"github/DiscreteTom/ble-raspi-manager/internal/characteristics/wifi"
 	"github/DiscreteTom/ble-raspi-manager/internal/config"
 	"time"
 
