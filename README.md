@@ -17,9 +17,10 @@ go build .
 
 ## Installation
 
-**Run as root**:
-
 ```bash
+# run the following script as root
+sudo -i
+
 # create a folder
 mkdir /root/brm
 cd /root/brm
@@ -39,7 +40,7 @@ cp brm.service /etc/systemd/system/
 systemctl daemon-reload
 
 # optional: modify config
-# vim ~/brm/config.json
+# vim /root/brm/config.json
 
 # start the service
 systemctl start brm
