@@ -6,6 +6,7 @@ import (
 	"github/DiscreteTom/ble-raspi-manager/internal/characteristics/wifi"
 	"github/DiscreteTom/ble-raspi-manager/internal/config"
 	"github/DiscreteTom/ble-raspi-manager/internal/shell"
+	"net"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,6 +19,7 @@ func main() {
 	namespaceUUID := uuid.NewSHA1(uuid.NameSpaceDNS, []byte("discretetom.github.io"))
 	serviceUUID := uuid.NewSHA1(namespaceUUID, []byte(conf.Secret))
 	serviceBleUUID, _ := bluetooth.ParseUUID(serviceUUID.String())
+	localNameSuffix := uuid.NewMD5(uuid.Nil, []byte(mustGetMacAddr())).String()[:8]
 
 	adapter := bluetooth.DefaultAdapter
 
@@ -27,7 +29,7 @@ func main() {
 	// Define the peripheral device info.
 	adv := adapter.DefaultAdvertisement()
 	must("config adv", adv.Configure(bluetooth.AdvertisementOptions{
-		LocalName:    "BLE Raspi Manager",
+		LocalName:    "BLE Raspi Manager - " + localNameSuffix,
 		ServiceUUIDs: []bluetooth.UUID{serviceBleUUID},
 	}))
 
@@ -59,4 +61,19 @@ func must(action string, err error) {
 	if err != nil {
 		panic("failed to " + action + ": " + err.Error())
 	}
+}
+
+func mustGetMacAddr() string {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, interf := range interfaces {
+		a := interf.HardwareAddr.String()
+		if a != "" {
+			return a
+		}
+	}
+	panic("no MAC address found.")
 }
