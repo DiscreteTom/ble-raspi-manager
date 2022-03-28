@@ -48,3 +48,5 @@ systemctl start brm
 # start the service on system startup
 systemctl enable brm
 ```
+
+## [CHANGELOG](https://github.com/DiscreteTom/ble-raspi-manager/blob/main/CHANGELOG.md)
