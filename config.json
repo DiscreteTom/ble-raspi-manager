@@ -1,3 +1,4 @@
 {
-  "secret": "Omnitrix"
+  "secret": "Omnitrix",
+  "healthCheckIntervalMs": 60000
 }

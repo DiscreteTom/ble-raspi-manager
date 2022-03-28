@@ -6,7 +6,8 @@ import (
 )
 
 type Config struct {
-	Secret string `json:"secret"`
+	Secret                string `json:"secret"`
+	HealthCheckIntervalMs int64  `json:"healthCheckIntervalMs"`
 }
 
 func GetConfig() Config {

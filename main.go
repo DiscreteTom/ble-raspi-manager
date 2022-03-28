@@ -5,6 +5,7 @@ import (
 	"github/DiscreteTom/ble-raspi-manager/internal/characteristics/command"
 	"github/DiscreteTom/ble-raspi-manager/internal/characteristics/wifi"
 	"github/DiscreteTom/ble-raspi-manager/internal/config"
+	"github/DiscreteTom/ble-raspi-manager/internal/shell"
 	"time"
 
 	"github.com/google/uuid"
@@ -45,7 +46,12 @@ func main() {
 	fmt.Println("ble-raspi-manager is running...")
 
 	for { // run forever
-		time.Sleep(100 * time.Second)
+		time.Sleep(time.Duration(conf.HealthCheckIntervalMs) * time.Millisecond)
+
+		// health check
+		if (shell.MustRunCommand("bluetoothctl show | grep 'Discoverable:' | cut -d' ' -f 2") == "no\n") || (shell.MustRunCommand("bluetoothctl show | grep ActiveInstances | cut -d'(' -f 2 | cut -d')' -f 1") == "0\n") {
+			panic("health check failed.")
+		}
 	}
 }
 

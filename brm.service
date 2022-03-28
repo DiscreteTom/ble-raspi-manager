@@ -1,7 +1,7 @@
 [Unit]
 Description=Bluetooth Low Energy Raspi Manager
-After=bluetooth.target
-Requires=bluetooth.target
+After=bluetooth.target bluetooth.service
+Requires=bluetooth.target bluetooth.service
 
 [Service]
 Type=idle
@@ -9,7 +9,7 @@ User=root
 WorkingDirectory=/root/brm
 ExecStart=/root/brm/brm
 Restart=always
-RestartSec=60
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
