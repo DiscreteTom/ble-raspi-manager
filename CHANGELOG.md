@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.2.0
+
+- Optimize communication protocol for long content.
+  - So this version is not compatible with previous ones.
+- Hide wifi password using `wpa_passphrase [ ssid ] [ passphrase ]`.
+  - And wifi password can no longer be retrieved.
+- Support multiple wifi configuration.
+
 ## v0.1.2
 
 Add local name suffix based on device's MAC address.
