@@ -22,7 +22,7 @@ func getWifiInfo() wifiInfo {
 	staticIP := getStaticIP()
 	return wifiInfo{
 		SSID:      getSSID(),
-		PSK:       getPSK(),
+		PSK:       "password can NOT be retrieved",
 		CurrentIP: getCurrentIP(),
 		Static:    len(staticIP) != 0,
 		StaticIP:  staticIP,
@@ -46,10 +46,6 @@ func getSSID() string {
 	return getCommandOutput("cat /etc/wpa_supplicant/wpa_supplicant.conf | grep -Eo 'ssid=\"[^\"]*\"' | cut -d'\"' -f 2")
 }
 
-func getPSK() string {
-	return getCommandOutput("cat /etc/wpa_supplicant/wpa_supplicant.conf | grep -Eo 'psk=\"[^\"]*\"' | cut -d'\"' -f 2")
-}
-
 func getStaticIP() string {
 	return getCommandOutput("cat /etc/dhcpcd.conf | grep -Eo '^static ip_address=.*' | cut -d'=' -f 2")
 }
@@ -62,16 +58,10 @@ func setNewWifi(ssid, psk string) {
 	if len(getSSID()) != 0 {
 		// remove original settings
 		shell.MustRunCommand("cp /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf.backup")
-		shell.MustRunCommand("sudo cat /etc/wpa_supplicant/wpa_supplicant.conf.backup | grep -v 'network=' | grep -v 'ssid=' | grep -v 'psk=' | grep -v '}' > /etc/wpa_supplicant/wpa_supplicant.conf")
+		shell.MustRunCommand("cat /etc/wpa_supplicant/wpa_supplicant.conf.backup | grep -v 'network=' | grep -v 'ssid=' | grep -v 'psk=' | grep -v '}' > /etc/wpa_supplicant/wpa_supplicant.conf")
 	}
 	// write new settings
-	shell.MustRunCommand(fmt.Sprintf(`
-sudo cat << EOF >> /etc/wpa_supplicant/wpa_supplicant.conf
-network={
-	ssid="%s"
-	psk="%s"
-}
-EOF`, ssid, psk))
+	shell.MustRunCommand(fmt.Sprintf("wpa_passphrase '%s' '%s' | grep -v '#psk' >> /etc/wpa_supplicant/wpa_supplicant.conf", ssid, psk))
 	shell.MustRunCommand("wpa_cli -i wlan0 reconfigure") // restart interface to apply
 }
 
